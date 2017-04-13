@@ -1,0 +1,38 @@
+meter_id,meter_name,sub_location,location,location_detail,equipment_type,unit_type,last_updated
+246,Busbar West,West Wing Busbar,West Wing,General,Busbar,kWh,2017-04-06 05:00:00
+247,Mech West,West Wing Mech,West Wing,General,Mech Services,kWh,2017-04-06 05:00:00
+248,PDU No.2,West Wing PDUs,West Wing,General,PDU,kWh,2017-04-06 05:00:00
+249,Car Park Ltg,Car Park,External,Car Park,Lighting,kWh,2017-04-06 05:00:00
+250,Lifts West,West Wing Lifts,West Wing,Lifts,Lifts,kWh,2017-04-06 05:00:00
+251,Busbar East,East Wing Busbar,East Wing,General,Busbar,kWh,2017-04-06 05:00:00
+252,Mech East,East Wing Mech,East Wing,General,Mech Services,kWh,2017-04-06 05:00:00
+253,PDU No.1,East Wing PDUs,East Wing,General,PDU,kWh,2017-04-06 05:00:00
+254,Kitchen,Kitchen,East Wing,Kitchen,Kitchen Equipment,kWh,2017-04-06 05:00:00
+255,Football Lighting,Football Pitch,External,Football Pitch,Lighting,kWh,2017-04-06 05:00:00
+256,Lifts East,East Wing Lifts,East Wing,Lifts,Lifts,kWh,2017-04-06 05:00:00
+706,Ground Floor Core Services GWLL,West W Ground Floor,West Wing,Ground Floor,Multiple,kWh,2017-04-06 05:00:00
+718,Second Floor Lighting SW2,West W Second Floor,West Wing,Second Floor,Lighting,kWh,2017-04-06 05:00:00
+719,Second Floor Power SW1,West W Second Floor,West Wing,Second Floor,Power,kWh,2017-04-06 05:00:00
+720,Second Floor Lighting SW1,West W Second Floor,West Wing,Second Floor,Lighting,kWh,2017-04-06 05:00:00
+721,Third Floor Core Services TWLL,West W Third Floor,West Wing,Third Floor,Multiple,kWh,2017-04-06 05:00:00
+722,Ground Floor Core Services GELL,East W Ground Floor,East Wing,Ground Floor,Multiple,kWh,2017-04-06 05:00:00
+723,Ground Floor Power GE,East W Ground Floor,East Wing,Ground Floor,Power,kWh,2017-04-06 05:00:00
+724,Ground Floor Lighting GE,East W Ground Floor,East Wing,Ground Floor,Lighting,kWh,2017-04-06 05:00:00
+725,First Floor Core Services FELL,East W First Floor,East Wing,First Floor,Multiple,kWh,2017-04-06 05:00:00
+726,First Floor Power FE,East W First Floor,East Wing,First Floor,Power,kWh,2017-04-06 05:00:00
+727,First Floor Lighting FE,East W First Floor,East Wing,First Floor,Lighting,kWh,2017-04-06 05:00:00
+728,Second Floor Core Services SELL,East W Second Floor,East Wing,Second Floor,Multiple,kWh,2017-04-06 05:00:00
+729,Second Floor Power SE,East W Second Floor,East Wing,Second Floor,Power,kWh,2017-04-06 05:00:00
+730,Second Floor Lighting SE,East W Second Floor,East Wing,Second Floor,Lighting,kWh,2017-04-06 05:00:00
+731,Third Floor Light & Power TE,East W Third Floor,East Wing,Third Floor,Multiple,kWh,2017-04-06 05:00:00
+707,Ground Floor Power GW2,West W Ground Floor,West Wing,Ground Floor,Power,kWh,2017-04-06 05:00:00
+708,Ground Floor Lighting GW2,West W Ground Floor,West Wing,Ground Floor,Lighting,kWh,2017-04-06 05:00:00
+709,Ground Floor Power GW1,West W Ground Floor,West Wing,Ground Floor,Power,kWh,2017-04-06 05:00:00
+710,Ground Floor Lighting GW1,West W Ground Floor,West Wing,Ground Floor,Lighting,kWh,2017-04-06 05:00:00
+711,First Floor Core Services FWLL,West W First Floor,West Wing,First Floor,Multiple,kWh,2017-04-06 05:00:00
+712,First Floor Power FW2,West W First Floor,West Wing,First Floor,Power,kWh,2017-04-06 05:00:00
+713,First Floor Lighting FW2,West W First Floor,West Wing,First Floor,Lighting,kWh,2017-04-06 05:00:00
+714,First Floor Power FW1,West W First Floor,West Wing,First Floor,Power,kWh,2017-04-06 05:00:00
+715,First Floor Lighting FW1,West W First Floor,West Wing,First Floor,Lighting,kWh,2017-04-06 05:00:00
+716,Second Floor Core Services SWLL,West W Second Floor,West Wing,Second Floor,Multiple,kWh,2017-04-06 05:00:00
+717,Second Floor Power SW2,West W Second Floor,West Wing,Second Floor,Power,kWh,2017-04-06 05:00:00
