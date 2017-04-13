@@ -1,15 +1,21 @@
 
+var crossfilter = require('crossfilter')
+var dc = require('dc')
+var d3 = require('d3')
+require('./main.html') // force index.html to do into dist
+require('./node_modules/dc/dc.css')
+
 var weekdays = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat']
 
 function weekOfYear(date){
-    soy = new Date(date.getFullYear(), 0, 0);
-    elapsed = date - soy
-    weeks = Math.trunc(elapsed/1000/60/60/24/7)
+    var soy = new Date(date.getFullYear(), 0, 0);
+    var elapsed = date - soy
+    var weeks = Math.trunc(elapsed/1000/60/60/24/7)
     return weeks
 }
 
 function init(){
-    d3.csv('oxy_info_enh.csv', function(error, info){
+    d3.csv('../data/oxy_info_enh.csv', function(error, info){
         var locations = {}
         info.forEach(i => {
             locations[+i.meter_id] = {
@@ -21,14 +27,14 @@ function init(){
             };
         });
         console.log(locations[246]);
-        d3.csv('oxy_data_2017_feb.csv', function(error, data){
+        d3.csv('../data/oxy_data_2017_feb.csv', function(error, data){
             data.forEach(function(r){
                 r.meter_id = +r.meter_id;
                 r.net_energy = +r.net_energy;
                 r.cumulative_energy = +r.cumulative_energy;
                 r.net_power = +r.net_power;
-                date = r.date_time.split(' ')[0]
-                parts = date.split('/')
+                var date = r.date_time.split(' ')[0]
+                var parts = date.split('/')
                 r.date_time = new Date(parts[2], parts[1] - 1, parts[0])
                 r.dow = r.date_time.getDay();
                 r.hour = r.date_time.getHours();
@@ -64,14 +70,29 @@ function init(){
             //      .gap(50)
             //      .xUnits(dc.units.ordinal)
             // ;
+            var rangeChart = dc.barChart('#range');
+            rangeChart
+                .height(80)
+                .width(1100)
+                .dimension(dims.date)
+                .group(netEnergyByDate)
+                .centerBar(true)
+                .gap(200)
+                .mouseZoomable(false)
+                .round(d3.time.month.round)
+                .margins({top: 10, right: 50, bottom: 20, left: 40})
+                .xUnits(d3.time.months)
+                .x(d3.time.scale().domain([new Date(2017, 0, 1), new Date(2017, 4, 1)]))
+            ;
             var dowChart = dc.barChart('#chart')
-            dowChart.width(800)
+            dowChart.width(700)
                  .height(400)
                  .x(d3.scale.ordinal())
                  .xAxisLabel('Weekdays')
                  .yAxisLabel('Net Energy')
                  .dimension(dims.dow)
                  .group(dowGroup)
+                .margins({top: 20, right: 20, bottom: 50, left: 80})
                  .elasticY(true)
                  .gap(50)
                  .xUnits(dc.units.ordinal)
@@ -80,15 +101,15 @@ function init(){
             var typeChart = dc.pieChart('#pie');
             typeChart
                 .width(300)
-                .height(300)
+                .height(400)
                 .innerRadius(50)
                 .dimension(dims.type)
                 .group(netEnergyGroup)
 
-            var locChart = dc.rowChart('#table')
+            var locChart = dc.rowChart('#location')
             locChart
                 .width(300)
-                .height(300)
+                .height(400)
                 .dimension(dims.location)
                 .group(netEnergyByLoc)
                 .elasticX(true)
@@ -97,13 +118,15 @@ function init(){
             var timeChart = dc.lineChart('#time');
             timeChart
                 .renderArea(true)
-                .width(800)
+                .width(700)
                 .height(400)
                 .dimension(dims.date)
                 .group(netEnergyByDate, 'Net Energy')
-                .mouseZoomable(true)
+                .mouseZoomable(false)
                 .x(d3.time.scale().domain(d3.extent(data, d => d.date_time)))
                 .elasticY(true)
+                .rangeChart(rangeChart)
+                .margins({top: 20, right: 20, bottom: 50, left: 80})
 
             dc.renderAll();
         });
