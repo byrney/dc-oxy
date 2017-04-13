@@ -38,7 +38,7 @@ function init(){
                 r.date_time = new Date(parts[2], parts[1] - 1, parts[0])
                 r.dow = r.date_time.getDay();
                 r.hour = r.date_time.getHours();
-                r.week = weekOfYear(r.date_time);
+                r.week = r.date_time - r.date_time.getDay() * 100 * 60 * 60 * 24;
             });
             console.log(data);
             var ndx = crossfilter(data);
@@ -56,6 +56,7 @@ function init(){
             var netEnergyByWeek = dims.week.group().reduceSum(d => d.net_energy);
             var netEnergyByDate = dims.date.group().reduceSum(d => d.net_energy);
             var dowGroup = dims.dow.group().reduceSum(d => d.net_energy);
+            var countByDate = dims.date.group().reduceSum(d => d.net_energy > 0 ? 1 : 0)
             var meterCount = dims.meter.group().reduceSum(d => d.net_energy > 0 ? 1 : 0)
             var meterEnergy = dims.meter.group().reduceSum(d => d.net_energy > 0 ? 1 : 0)
             var domain = Object.keys(locations)
@@ -74,15 +75,15 @@ function init(){
             rangeChart
                 .height(80)
                 .width(1100)
-                .dimension(dims.date)
-                .group(netEnergyByDate)
+                .dimension(dims.week)
+                .group(netEnergyByWeek)
                 .centerBar(true)
-                .gap(200)
+                .gap(6)
                 .mouseZoomable(false)
-                .round(d3.time.month.round)
+                //.round(d3.time.week.round)
                 .margins({top: 10, right: 50, bottom: 20, left: 40})
                 .xUnits(d3.time.months)
-                .x(d3.time.scale().domain([new Date(2017, 0, 1), new Date(2017, 4, 1)]))
+                .x(d3.time.scale().domain([new Date(2017, 0, 1), new Date(2017, 3, 1)]))
             ;
             var dowChart = dc.barChart('#chart')
             dowChart.width(700)
