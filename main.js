@@ -42,25 +42,24 @@ function init(){
                 r.week.setDate(r.week.getDate() - r.week.getDay());
             });
             console.log(data);
+            // create the overview ndx for the top range chart
             var ndxOverview = crossfilter(data);
             var dimOverview = ndxOverview.dimension(dc.pluck('week'));
             var grpOverview = dimOverview.group().reduceSum(d => d.net_energy);
+            // create the ndx for the varius subcharts
             var ndx = crossfilter(data);
             var dims = {
                 date: ndx.dimension(dc.pluck('date_time')),
                 dow: ndx.dimension(dc.pluck('dow')),
-                meter: ndx.dimension(dc.pluck('meter_id')),
                 type: ndx.dimension(m => locations[m.meter_id].equipment_type),
-                sub_location: ndx.dimension(m => locations[m.meter_id].sub_location),
                 location: ndx.dimension(m => locations[m.meter_id].location),
+                location_detail: ndx.dimension(m => locations[m.meter_id].location_detail),
             };
             var netEnergyGroup = dims.type.group().reduceSum(d => d.net_energy);
             var netEnergyByLoc = dims.location.group().reduceSum(d => d.net_energy);
+            var netEnergyByLocDetail = dims.location_detail.group().reduceSum(d => d.net_energy);
             var netEnergyByDate = dims.date.group().reduceSum(d => d.net_energy);
             var dowGroup = dims.dow.group().reduceSum(d => d.net_energy);
-            var countByDate = dims.date.group().reduceSum(d => d.net_energy > 0 ? 1 : 0)
-            var meterCount = dims.meter.group().reduceSum(d => d.net_energy > 0 ? 1 : 0)
-            var meterEnergy = dims.meter.group().reduceSum(d => d.net_energy > 0 ? 1 : 0)
             var domain = Object.keys(locations)
             // chart.width(800)
             //      .height(400)
@@ -112,10 +111,19 @@ function init(){
 
             var locChart = dc.rowChart('#location')
             locChart
-                .width(300)
-                .height(400)
+                .width(280)
+                .height(150)
                 .dimension(dims.location)
                 .group(netEnergyByLoc)
+                .elasticX(true)
+                .xAxis().ticks(4)
+            ;
+            var locDetailChart = dc.rowChart('#location-detail')
+            locDetailChart
+                .width(280)
+                .height(250)
+                .dimension(dims.location_detail)
+                .group(netEnergyByLocDetail)
                 .elasticX(true)
                 .xAxis().ticks(4)
             ;
