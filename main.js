@@ -38,9 +38,13 @@ function init(){
                 r.date_time = new Date(parts[2], parts[1] - 1, parts[0])
                 r.dow = r.date_time.getDay();
                 r.hour = r.date_time.getHours();
-                r.week = r.date_time - r.date_time.getDay() * 100 * 60 * 60 * 24;
+                r.week = new Date(r.date_time);
+                r.week.setDate(r.week.getDate() - r.week.getDay());
             });
             console.log(data);
+            var ndxOverview = crossfilter(data);
+            var dimOverview = ndxOverview.dimension(dc.pluck('week'));
+            var grpOverview = dimOverview.group().reduceSum(d => d.net_energy);
             var ndx = crossfilter(data);
             var dims = {
                 date: ndx.dimension(dc.pluck('date_time')),
@@ -49,11 +53,9 @@ function init(){
                 type: ndx.dimension(m => locations[m.meter_id].equipment_type),
                 sub_location: ndx.dimension(m => locations[m.meter_id].sub_location),
                 location: ndx.dimension(m => locations[m.meter_id].location),
-                week: ndx.dimension(dc.pluck('week'))
             };
             var netEnergyGroup = dims.type.group().reduceSum(d => d.net_energy);
             var netEnergyByLoc = dims.location.group().reduceSum(d => d.net_energy);
-            var netEnergyByWeek = dims.week.group().reduceSum(d => d.net_energy);
             var netEnergyByDate = dims.date.group().reduceSum(d => d.net_energy);
             var dowGroup = dims.dow.group().reduceSum(d => d.net_energy);
             var countByDate = dims.date.group().reduceSum(d => d.net_energy > 0 ? 1 : 0)
@@ -71,20 +73,21 @@ function init(){
             //      .gap(50)
             //      .xUnits(dc.units.ordinal)
             // ;
-            var rangeChart = dc.barChart('#range');
+            var rangeChart = dc.lineChart('#range', 'other-group');
             rangeChart
                 .height(80)
                 .width(1100)
-                .dimension(dims.week)
-                .group(netEnergyByWeek)
-                .centerBar(true)
-                .gap(6)
+                .dimension(dimOverview)
+                .group(grpOverview)
+                //.centerBar(true)
+                //.gap(6)
                 .mouseZoomable(false)
                 //.round(d3.time.week.round)
                 .margins({top: 10, right: 50, bottom: 20, left: 40})
                 .xUnits(d3.time.months)
                 .x(d3.time.scale().domain([new Date(2017, 0, 1), new Date(2017, 3, 1)]))
             ;
+            rangeChart.yAxis().ticks(0);
             var dowChart = dc.barChart('#chart')
             dowChart.width(700)
                  .height(400)
@@ -128,7 +131,7 @@ function init(){
                 .elasticY(true)
                 .rangeChart(rangeChart)
                 .margins({top: 20, right: 20, bottom: 50, left: 80})
-
+            dc.renderAll('other-group');
             dc.renderAll();
         });
     });
