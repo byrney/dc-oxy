@@ -7,138 +7,145 @@ require('./node_modules/dc/dc.css')
 
 var weekdays = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat']
 
-function weekOfYear(date){
-    var soy = new Date(date.getFullYear(), 0, 0);
-    var elapsed = date - soy
-    var weeks = Math.trunc(elapsed/1000/60/60/24/7)
-    return weeks
+function dataClean(r){
+    r.meter_id = +r.meter_id;
+    r.net_energy = +r.net_energy;
+    r.cumulative_energy = +r.cumulative_energy;
+    r.net_power = +r.net_power;
+    var date = r.date_time.split(' ')[0];
+    var parts = date.split('/');
+    r.date_time = new Date(parts[2], parts[1] - 1, parts[0]);
+    r.dow = r.date_time.getDay();
+    r.hour = r.date_time.getHours();
+    r.week = new Date(r.date_time);
+    r.week.setDate(r.week.getDate() - r.week.getDay());
+}
+
+function chartOverview(ndx, info, data){
+    var dim = ndx.dimension(dc.pluck('week'));
+    var grp = dim.group().reduceSum(d => d.net_energy);
+    chart = dc.lineChart('#range', 'other-group');
+    chart
+        .height(80)
+        .width(1100)
+        .dimension(dim)
+        .group(grp)
+        .mouseZoomable(false)
+        .margins({top: 10, right: 50, bottom: 20, left: 40})
+        .xUnits(d3.time.months)
+        .x(d3.time.scale().domain([new Date(2017, 0, 1), new Date(2017, 3, 1)]))
+    ;
+    chart.yAxis().ticks(0);
+    return chart;
+}
+
+function infoLocations(info){
+    var locations = {}
+    info.forEach(i => {
+        locations[+i.meter_id] = {
+            meter_name: i.meter_name,
+            sub_location: i.sub_location,
+            equipment_type: i.equipment_type,
+            location: i.location,
+            location_detail: i.location_detail
+        };
+    });
+    return locations;
+}
+
+function chartDow(ndx, info, data){
+    var dim = ndx.dimension(dc.pluck('dow'));
+    var grp = dim.group().reduceSum(d => d.net_energy);
+    var chart = dc.barChart('#chart');
+    chart.width(700)
+         .height(400)
+         .x(d3.scale.ordinal())
+         .xAxisLabel('Weekdays')
+         .yAxisLabel('Net Energy')
+         .dimension(dim)
+         .group(grp)
+         .margins({top: 20, right: 20, bottom: 50, left: 80})
+         .elasticY(true)
+         .gap(50)
+         .xUnits(dc.units.ordinal)
+         .xAxis().tickFormat(d => weekdays[d])
+    ;
+    return chart;
+}
+
+function chartType(ndx, locations, data){
+    var dim = ndx.dimension(m => locations[m.meter_id].equipment_type);
+    var grp = dim.group().reduceSum(d => d.net_energy);
+    var chart = dc.pieChart('#pie');
+    chart
+        .width(300)
+        .height(400)
+        .innerRadius(50)
+        .dimension(dim)
+        .group(grp)
+    ;
+    return chart;
+}
+
+function chartLocation(ndx, locations, data){
+    var dim = ndx.dimension(m => locations[m.meter_id].location);
+    var grp = dim.group().reduceSum(d => d.net_energy);
+    var chart = dc.rowChart('#location')
+    chart
+        .width(280)
+        .height(150)
+        .dimension(dim)
+        .group(grp)
+        .elasticX(true)
+        .xAxis().ticks(4)
+    ;
+    return chart;
+}
+
+function chartLocDetail(ndx, locations, data){
+    var dim = ndx.dimension(m => locations[m.meter_id].location_detail);
+    var grp = dim.group().reduceSum(d => d.net_energy);
+    return dc.rowChart('#location-detail')
+        .width(280)
+        .height(250)
+        .dimension(dim)
+        .group(grp)
+        .elasticX(true)
+        .xAxis().ticks(4)
+}
+
+function chartTime(ndx, locations, data, rangeChart){
+    var dim = ndx.dimension(dc.pluck('date_time'));
+    var grp = dim.group().reduceSum(d => d.net_energy);
+    var chart = dc.lineChart('#time');
+    chart
+        .renderArea(true)
+        .width(700)
+        .height(400)
+        .dimension(dim)
+        .group(grp, 'Net Energy')
+        .mouseZoomable(false)
+        .x(d3.time.scale().domain(d3.extent(data, d => d.date_time)))
+        .elasticY(true)
+        .rangeChart(rangeChart)
+        .margins({top: 20, right: 20, bottom: 50, left: 80})
+    return chart;
 }
 
 function init(){
     d3.csv('../data/oxy_info_enh.csv', function(error, info){
-        var locations = {}
-        info.forEach(i => {
-            locations[+i.meter_id] = {
-                meter_name: i.meter_name,
-                sub_location: i.sub_location,
-                equipment_type: i.equipment_type,
-                location: i.location,
-                location_detail: i.location_detail
-            };
-        });
-        console.log(locations[246]);
+        var locations = infoLocations(info)
         d3.csv('../data/oxy_data_2017_feb.csv', function(error, data){
-            data.forEach(function(r){
-                r.meter_id = +r.meter_id;
-                r.net_energy = +r.net_energy;
-                r.cumulative_energy = +r.cumulative_energy;
-                r.net_power = +r.net_power;
-                var date = r.date_time.split(' ')[0]
-                var parts = date.split('/')
-                r.date_time = new Date(parts[2], parts[1] - 1, parts[0])
-                r.dow = r.date_time.getDay();
-                r.hour = r.date_time.getHours();
-                r.week = new Date(r.date_time);
-                r.week.setDate(r.week.getDate() - r.week.getDay());
-            });
-            console.log(data);
-            // create the overview ndx for the top range chart
+            data.forEach(dataClean);
             var ndxOverview = crossfilter(data);
-            var dimOverview = ndxOverview.dimension(dc.pluck('week'));
-            var grpOverview = dimOverview.group().reduceSum(d => d.net_energy);
+            var rangeChart = chartOverview(ndxOverview, info, data);
             // create the ndx for the varius subcharts
             var ndx = crossfilter(data);
-            var dims = {
-                date: ndx.dimension(dc.pluck('date_time')),
-                dow: ndx.dimension(dc.pluck('dow')),
-                type: ndx.dimension(m => locations[m.meter_id].equipment_type),
-                location: ndx.dimension(m => locations[m.meter_id].location),
-                location_detail: ndx.dimension(m => locations[m.meter_id].location_detail),
-            };
-            var netEnergyGroup = dims.type.group().reduceSum(d => d.net_energy);
-            var netEnergyByLoc = dims.location.group().reduceSum(d => d.net_energy);
-            var netEnergyByLocDetail = dims.location_detail.group().reduceSum(d => d.net_energy);
-            var netEnergyByDate = dims.date.group().reduceSum(d => d.net_energy);
-            var dowGroup = dims.dow.group().reduceSum(d => d.net_energy);
-            var domain = Object.keys(locations)
-            // chart.width(800)
-            //      .height(400)
-            //      .x(d3.scale.ordinal())
-            //      .xAxisLabel('dow')
-            //      .yAxisLabel('Net Energy')
-            //      .dimension(dims.meter)
-            //      .group(meterCount)
-            //      .elasticY(true)
-            //      .gap(50)
-            //      .xUnits(dc.units.ordinal)
-            // ;
-            var rangeChart = dc.lineChart('#range', 'other-group');
-            rangeChart
-                .height(80)
-                .width(1100)
-                .dimension(dimOverview)
-                .group(grpOverview)
-                //.centerBar(true)
-                //.gap(6)
-                .mouseZoomable(false)
-                //.round(d3.time.week.round)
-                .margins({top: 10, right: 50, bottom: 20, left: 40})
-                .xUnits(d3.time.months)
-                .x(d3.time.scale().domain([new Date(2017, 0, 1), new Date(2017, 3, 1)]))
-            ;
-            rangeChart.yAxis().ticks(0);
-            var dowChart = dc.barChart('#chart')
-            dowChart.width(700)
-                 .height(400)
-                 .x(d3.scale.ordinal())
-                 .xAxisLabel('Weekdays')
-                 .yAxisLabel('Net Energy')
-                 .dimension(dims.dow)
-                 .group(dowGroup)
-                .margins({top: 20, right: 20, bottom: 50, left: 80})
-                 .elasticY(true)
-                 .gap(50)
-                 .xUnits(dc.units.ordinal)
-                 .xAxis().tickFormat(d => weekdays[d])
-            ;
-            var typeChart = dc.pieChart('#pie');
-            typeChart
-                .width(300)
-                .height(400)
-                .innerRadius(50)
-                .dimension(dims.type)
-                .group(netEnergyGroup)
-
-            var locChart = dc.rowChart('#location')
-            locChart
-                .width(280)
-                .height(150)
-                .dimension(dims.location)
-                .group(netEnergyByLoc)
-                .elasticX(true)
-                .xAxis().ticks(4)
-            ;
-            var locDetailChart = dc.rowChart('#location-detail')
-            locDetailChart
-                .width(280)
-                .height(250)
-                .dimension(dims.location_detail)
-                .group(netEnergyByLocDetail)
-                .elasticX(true)
-                .xAxis().ticks(4)
-            ;
-            var timeChart = dc.lineChart('#time');
-            timeChart
-                .renderArea(true)
-                .width(700)
-                .height(400)
-                .dimension(dims.date)
-                .group(netEnergyByDate, 'Net Energy')
-                .mouseZoomable(false)
-                .x(d3.time.scale().domain(d3.extent(data, d => d.date_time)))
-                .elasticY(true)
-                .rangeChart(rangeChart)
-                .margins({top: 20, right: 20, bottom: 50, left: 80})
+            var dowChart = chartDow(ndx, info, data)
+            var typeChart = chartType(ndx, locations, data);
+            var locChart = chartLocation(ndx, locations, data);
+            var locDetailChart = chartLocDetail(ndx, locations, data);
+            var timeChart = chartTime(ndx, locations, data, rangeChart);
             dc.renderAll('other-group');
             dc.renderAll();
         });
