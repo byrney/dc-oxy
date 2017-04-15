@@ -26,8 +26,8 @@ function chartOverview(ndx, info, data){
     var grp = dim.group().reduceSum(d => d.net_energy);
     chart = dc.lineChart('#range', 'other-group');
     chart
-        .height(80)
-        .width(1100)
+        .height(null)
+        .width(null)
         .dimension(dim)
         .group(grp)
         .mouseZoomable(false)
@@ -57,8 +57,8 @@ function chartDow(ndx, info, data){
     var dim = ndx.dimension(dc.pluck('dow'));
     var grp = dim.group().reduceSum(d => d.net_energy);
     var chart = dc.barChart('#chart');
-    chart.width(700)
-         .height(400)
+    chart.width(null)
+         .height(null)
          .x(d3.scale.ordinal())
          .xAxisLabel('Weekdays')
          .yAxisLabel('Net Energy')
@@ -66,7 +66,7 @@ function chartDow(ndx, info, data){
          .group(grp)
          .margins({top: 20, right: 20, bottom: 50, left: 80})
          .elasticY(true)
-         .gap(50)
+         .gap(10)
          .xUnits(dc.units.ordinal)
          .xAxis().tickFormat(d => weekdays[d])
     ;
@@ -78,9 +78,9 @@ function chartType(ndx, locations, data){
     var grp = dim.group().reduceSum(d => d.net_energy);
     var chart = dc.pieChart('#pie');
     chart
-        .width(300)
-        .height(400)
-        .innerRadius(50)
+        .width(null)
+        .height(null)
+        .innerRadius(25)
         .dimension(dim)
         .group(grp)
     ;
@@ -92,8 +92,8 @@ function chartLocation(ndx, locations, data){
     var grp = dim.group().reduceSum(d => d.net_energy);
     var chart = dc.rowChart('#location')
     chart
-        .width(280)
-        .height(150)
+        .width(null)
+        .height(null)
         .dimension(dim)
         .group(grp)
         .elasticX(true)
@@ -106,22 +106,32 @@ function chartLocDetail(ndx, locations, data){
     var dim = ndx.dimension(m => locations[m.meter_id].location_detail);
     var grp = dim.group().reduceSum(d => d.net_energy);
     return dc.rowChart('#location-detail')
-        .width(280)
-        .height(250)
+        .width(null)
+        .height(null)
         .dimension(dim)
         .group(grp)
         .elasticX(true)
         .xAxis().ticks(4)
 }
 
+function remove_empty_bins(source_group) {
+    return {
+        all:function () {
+            return source_group.all().filter(function(d) {
+                return d && d.value > 1e-7;
+            });
+        }
+    };
+}
+
 function chartTime(ndx, locations, data, rangeChart){
     var dim = ndx.dimension(dc.pluck('date_time'));
-    var grp = dim.group().reduceSum(d => d.net_energy);
+    var grp = remove_empty_bins(dim.group().reduceSum(d => d.net_energy));
     var chart = dc.lineChart('#time');
     chart
         .renderArea(true)
-        .width(700)
-        .height(400)
+        .width(null)
+        .height(null)
         .dimension(dim)
         .group(grp, 'Net Energy')
         .mouseZoomable(false)
