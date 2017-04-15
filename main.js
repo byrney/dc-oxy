@@ -4,6 +4,7 @@ var dc = require('dc')
 var d3 = require('d3')
 require('./main.html') // force index.html to do into dist
 require('./node_modules/dc/dc.css')
+require('./node_modules/purecss/build/grids.css')
 
 var weekdays = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat']
 
@@ -61,7 +62,6 @@ function chartDow(ndx, info, data){
          .height(null)
          .x(d3.scale.ordinal())
          .xAxisLabel('Weekdays')
-         .yAxisLabel('Net Energy')
          .dimension(dim)
          .group(grp)
          .margins({top: 20, right: 20, bottom: 50, left: 80})
@@ -133,7 +133,7 @@ function chartTime(ndx, locations, data, rangeChart){
         .width(null)
         .height(null)
         .dimension(dim)
-        .group(grp, 'Net Energy')
+        .group(grp)
         .mouseZoomable(false)
         .x(d3.time.scale().domain(d3.extent(data, d => d.date_time)))
         .elasticY(true)
