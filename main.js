@@ -1,10 +1,10 @@
 
-var crossfilter = require('crossfilter')
-var dc = require('dc')
-var d3 = require('d3')
-require('./main.html') // force index.html to do into dist
-require('./node_modules/dc/dc.css')
-require('./node_modules/purecss/build/grids.css')
+var crossfilter = require('crossfilter');
+var dc = require('dc');
+var d3 = require('d3');
+require('./main.html'); // force index.html to do into dist
+require('./node_modules/dc/dc.css');
+require('./node_modules/purecss/build/grids.css');
 
 var weekdays = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat']
 
@@ -54,9 +54,46 @@ function infoLocations(info){
     return locations;
 }
 
-function chartDow(ndx, info, data){
+function pieDow(ndx, info, data){
     var dim = ndx.dimension(dc.pluck('dow'));
     var grp = dim.group().reduceSum(d => d.net_energy);
+    var chart = dc.pieChart('#dow');
+    chart
+        .width(null)
+        .height(null)
+        .innerRadius(25)
+        .dimension(dim)
+        .group(grp)
+    ;
+    return chart;
+}
+
+function chartDow(ndx, info, data){
+    var dim = ndx.dimension(dc.pluck('dow'));
+    var grp = dim.group().reduce(
+        (p,v) => {
+            if(v.net_energy == 0){
+                return p;
+            }
+            var currCount = p.dates[v.date_time] || 0;
+            p.dates[v.date_time] = currCount + 1;
+            p.sum += v.net_energy;
+            return p;
+        },
+        (p,v) => {
+            if(v.net_energy == 0){
+                return p;
+            }
+            if(p.dates[v.date_time] > 1){
+                p.dates[v.date_time] -= 1;
+            } else {
+                delete p.dates[v.date_time];
+            }
+            p.sum -= v.net_energy;
+            return p;
+        },
+        () => ({dates: {}, sum: 0})
+    );
     var chart = dc.barChart('#chart');
     chart.width(null)
          .height(null)
@@ -64,6 +101,12 @@ function chartDow(ndx, info, data){
          .xAxisLabel('Weekdays')
          .dimension(dim)
          .group(grp)
+         .valueAccessor(p => {
+             var dates = Object.keys(p.value.dates).length;
+             if(dates == 0)
+                 return 0;
+             return p.value.sum / dates;
+         })
          .margins({top: 20, right: 20, bottom: 50, left: 80})
          .elasticY(true)
          .gap(10)
