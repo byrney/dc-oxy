@@ -64,6 +64,7 @@ function pieDow(ndx, info, data){
         .innerRadius(25)
         .dimension(dim)
         .group(grp)
+        .label(d => weekdays[d.key])
     ;
     return chart;
 }
@@ -194,7 +195,7 @@ function init(){
             var rangeChart = chartOverview(ndxOverview, info, data);
             // create the ndx for the varius subcharts
             var ndx = crossfilter(data);
-            var dowChart = chartDow(ndx, info, data)
+            var dowChart = pieDow(ndx, info, data)
             var typeChart = chartType(ndx, locations, data);
             var locChart = chartLocation(ndx, locations, data);
             var locDetailChart = chartLocDetail(ndx, locations, data);
