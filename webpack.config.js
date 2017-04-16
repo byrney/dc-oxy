@@ -6,10 +6,7 @@ var Promise      = require('es6-promise');
 var packages     = require('./package.json');
 var npmLibs      = Object.keys(packages.dependencies);
 var optimize = new webpack.optimize.CommonsChunkPlugin({name: "vendor", filename: 'vendor-bundle.js'});
-// Live reload the browser when changes
 var Notifier     = require('webpack-error-notification');
-var ReloadPlugin = require('webpack-livereload-plugin');
-var liveReload = new ReloadPlugin({port: 35729});
 
 module.exports = {
 
@@ -31,7 +28,7 @@ module.exports = {
         }
     },
 
-    plugins: [ liveReload, new Notifier(), optimize ],
+    plugins: [ new Notifier(), optimize ],
 
     module: {
         loaders: [
@@ -59,7 +56,8 @@ module.exports = {
     devServer: {
         historyApiFallback: true,
         host: 'localhost',
-        port: 9090
+        port: 9090,
+        inline: true
     },
 
     devtool: '#eval-source-map'
