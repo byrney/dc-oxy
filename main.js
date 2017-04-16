@@ -6,20 +6,19 @@ require('./main.html'); // force index.html to do into dist
 require('./node_modules/dc/dc.css');
 require('./node_modules/purecss/build/grids.css');
 
-var weekdays = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat']
+var weekdays = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+var dtFormat = d3.time.format("%d/%m/%Y %H:%M");
 
 function dataClean(r){
     r.meter_id = +r.meter_id;
     r.net_energy = +r.net_energy;
     r.cumulative_energy = +r.cumulative_energy;
     r.net_power = +r.net_power;
-    var date = r.date_time.split(' ')[0];
-    var parts = date.split('/');
-    r.date_time = new Date(parts[2], parts[1] - 1, parts[0]);
+    r.date_time = dtFormat.parse(r.date_time);
+    r.date = d3.time.day(r.date_time);
     r.dow = r.date_time.getDay();
     r.hour = r.date_time.getHours();
-    r.week = new Date(r.date_time);
-    r.week.setDate(r.week.getDate() - r.week.getDay());
+    r.week = d3.time.week(r.date_time);
 }
 
 function chartOverview(ndx, info, data){
@@ -76,8 +75,8 @@ function chartDow(ndx, info, data){
             if(v.net_energy == 0){
                 return p;
             }
-            var currCount = p.dates[v.date_time] || 0;
-            p.dates[v.date_time] = currCount + 1;
+            var currCount = p.dates[v.date] || 0;
+            p.dates[v.date] = currCount + 1;
             p.sum += v.net_energy;
             return p;
         },
@@ -85,10 +84,10 @@ function chartDow(ndx, info, data){
             if(v.net_energy == 0){
                 return p;
             }
-            if(p.dates[v.date_time] > 1){
-                p.dates[v.date_time] -= 1;
+            if(p.dates[v.date] > 1){
+                p.dates[v.date] -= 1;
             } else {
-                delete p.dates[v.date_time];
+                delete p.dates[v.date];
             }
             p.sum -= v.net_energy;
             return p;
