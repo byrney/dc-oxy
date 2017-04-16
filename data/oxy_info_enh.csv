@@ -3,13 +3,13 @@ meter_id,meter_name,sub_location,location,location_detail,equipment_type,unit_ty
 247,Mech West,West Wing Mech,West Wing,General,Mech Services,kWh,2017-04-06 05:00:00
 248,PDU No.2,West Wing PDUs,West Wing,General,PDU,kWh,2017-04-06 05:00:00
 249,Car Park Ltg,Car Park,External,Car Park,Lighting,kWh,2017-04-06 05:00:00
-250,Lifts West,West Wing Lifts,West Wing,Lifts,Lifts,kWh,2017-04-06 05:00:00
+250,Lifts West,West Wing Lifts,West Wing,General,Lifts,kWh,2017-04-06 05:00:00
 251,Busbar East,East Wing Busbar,East Wing,General,Busbar,kWh,2017-04-06 05:00:00
 252,Mech East,East Wing Mech,East Wing,General,Mech Services,kWh,2017-04-06 05:00:00
 253,PDU No.1,East Wing PDUs,East Wing,General,PDU,kWh,2017-04-06 05:00:00
 254,Kitchen,Kitchen,East Wing,Kitchen,Kitchen Equipment,kWh,2017-04-06 05:00:00
 255,Football Lighting,Football Pitch,External,Football Pitch,Lighting,kWh,2017-04-06 05:00:00
-256,Lifts East,East Wing Lifts,East Wing,Lifts,Lifts,kWh,2017-04-06 05:00:00
+256,Lifts East,East Wing Lifts,East Wing,General,Lifts,kWh,2017-04-06 05:00:00
 706,Ground Floor Core Services GWLL,West W Ground Floor,West Wing,Ground Floor,Multiple,kWh,2017-04-06 05:00:00
 718,Second Floor Lighting SW2,West W Second Floor,West Wing,Second Floor,Lighting,kWh,2017-04-06 05:00:00
 719,Second Floor Power SW1,West W Second Floor,West Wing,Second Floor,Power,kWh,2017-04-06 05:00:00
