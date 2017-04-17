@@ -31,25 +31,38 @@ module.exports = {
     plugins: [ new Notifier(), optimize ],
 
     module: {
-        loaders: [
-            { test: /\.json$/, loader: "json-loader" } ,
-            // underscore templates
-            { test: /\.ejs$/,                              loader: "ejs-loader" },
-            // output the index file directly
-            { test: /main\.html$/,                         loader: "file-loader?name=index.html" },
-            //{ test: /\.html$/,                             loader: "file-loader?name=[name].[ext]" },
-            // inline or emit fonts and images depending on size
-            { test: /\.(png|woff|woff2|eot|ttf|svg|otf)$/, loader: 'url-loader?limit=500&name=[name].[ext]' },
-            // load css
-            { test: /\.css$/,                              loader: "style-loader!css-loader" },
-            // convert sass to css and load
-            { test: /\.scss$/,                             loader: "style-loader!css-loader!sass" },
+        rules: [
+            {
+                test: /\.json$/, use: ["json-loader"]
+            },
+            {// underscore templates
+                test: /\.ejs$/, use: ["ejs-loader"]
+            },
+            {// output the index file directly
+                test: /main\.html$/, use: ["file-loader?name=index.html"]
+            },
+            {// inline or emit fonts and images depending on size
+                test: /\.(png|woff|woff2|eot|ttf|svg|otf)$/, use: ['url-loader?limit=500&name=[name].[ext]']
+            },
+            {// load css
+                test: /\.css$/, use: ["style-loader", "css-loader"]
+            },
             // font-awesome loaders
-            { test: /\.woff(\?v=\d+\.\d+\.\d+)?$/,          loader: "url-loader?limit=10000&mimetype=application/font-woff" },
-            { test: /\.woff2(\?v=\d+\.\d+\.\d+)?$/,         loader: "url-loader?limit=10000&mimetype=application/font-woff" },
-            { test: /\.ttf(\?v=\d+\.\d+\.\d+)?$/,           loader: "url-loader?limit=10000&mimetype=application/octet-stream" },
-            { test: /\.eot(\?v=\d+\.\d+\.\d+)?$/,           loader: "file-loader" },
-            { test: /\.svg(\?v=\d+\.\d+\.\d+)?$/,           loader: "url-loader?limit=10000&mimetype=image/svg+xml" }
+            {
+                test: /\.woff(\?v=\d+\.\d+\.\d+)?$/, use: ["url-loader?limit=10000&mimetype=application/font-woff" ]
+            },
+            {
+                test: /\.woff2(\?v=\d+\.\d+\.\d+)?$/, use: ["url-loader?limit=10000&mimetype=application/font-woff" ]
+            },
+            {
+                test: /\.ttf(\?v=\d+\.\d+\.\d+)?$/, use: ["url-loader?limit=10000&mimetype=application/octet-stream"]
+            },
+            {
+                test: /\.eot(\?v=\d+\.\d+\.\d+)?$/, use: ["file-loader"]
+            },
+            {
+                test: /\.svg(\?v=\d+\.\d+\.\d+)?$/, use: ["url-loader?limit=10000&mimetype=image/svg+xml"]
+            }
         ],
     },
 
@@ -58,9 +71,6 @@ module.exports = {
         host: 'localhost',
         port: 9090,
         inline: true
-    },
-
-    devtool: '#eval-source-map'
-
+    }
 
 };
