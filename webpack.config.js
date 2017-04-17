@@ -76,7 +76,13 @@ module.exports = {
         historyApiFallback: true,
         host: 'localhost',
         port: 9090,
-        inline: true
+        inline: true,
+        proxy: {
+            '/api': {
+                target: 'http://localhost:5000',
+                secure: false
+            }
+        }
     }
 
 };

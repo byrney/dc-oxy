@@ -1,0 +1,12 @@
+name: dc-oxy
+channels:
+- defaults
+dependencies:
+- flask=0.12.1=py35_0
+- pip=9.0.1=py35_1
+- psycopg2=2.7.1=py35_0
+- python=3.5.3=1
+- setuptools=27.2.0=py35_0
+- wheel=0.29.0=py35_0
+prefix: /Users/rob/miniconda3/envs/dc-oxy
+
