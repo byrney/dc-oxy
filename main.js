@@ -7,7 +7,7 @@ require('./node_modules/dc/dc.css');
 require('./node_modules/purecss/build/grids.css');
 
 var weekdays = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
-var dtFormat = d3.time.format("%d/%m/%Y %H:%M");
+var dtFormat = d3.time.format('%d/%m/%Y %H:%M');
 
 function dataClean(r){
     r.meter_id = +r.meter_id;
@@ -24,7 +24,7 @@ function dataClean(r){
 function chartOverview(ndx, info, data){
     var dim = ndx.dimension(dc.pluck('week'));
     var grp = dim.group().reduceSum(d => d.net_energy);
-    chart = dc.lineChart('#range', 'other-group');
+    var chart = dc.lineChart('#range', 'other-group');
     chart
         .height(null)
         .width(null)
@@ -40,7 +40,7 @@ function chartOverview(ndx, info, data){
 }
 
 function infoLocations(info){
-    var locations = {}
+    var locations = {};
     info.forEach(i => {
         locations[+i.meter_id] = {
             meter_name: i.meter_name,
@@ -68,6 +68,8 @@ function pieDow(ndx, info, data){
     return chart;
 }
 
+/*
+// Version of DOW showing average energy for each weekday
 function chartDow(ndx, info, data){
     var dim = ndx.dimension(dc.pluck('dow'));
     var grp = dim.group().reduce(
@@ -115,6 +117,7 @@ function chartDow(ndx, info, data){
     ;
     return chart;
 }
+*/
 
 function chartType(ndx, locations, data){
     var dim = ndx.dimension(m => locations[m.meter_id].equipment_type);
@@ -133,7 +136,7 @@ function chartType(ndx, locations, data){
 function chartLocation(ndx, locations, data){
     var dim = ndx.dimension(m => locations[m.meter_id].location);
     var grp = dim.group().reduceSum(d => d.net_energy);
-    var chart = dc.rowChart('#location')
+    var chart = dc.rowChart('#location');
     chart
         .width(null)
         .height(null)
@@ -155,6 +158,7 @@ function chartLocDetail(ndx, locations, data){
         .group(grp)
         .elasticX(true)
         .xAxis().ticks(4)
+    ;
 }
 
 function remove_empty_bins(source_group) {
@@ -182,28 +186,29 @@ function chartTime(ndx, locations, data, rangeChart){
         .elasticY(true)
         .rangeChart(rangeChart)
         .margins({top: 20, right: 20, bottom: 50, left: 80})
+    ;
     return chart;
 }
 
 function init(){
     d3.csv('../data/oxy_info_enh.csv', function(error, info){
-        var locations = infoLocations(info)
+        var locations = infoLocations(info);
         d3.csv('../data/oxy_data_2017_feb.csv', function(error, data){
             data.forEach(dataClean);
             var ndxOverview = crossfilter(data);
             var rangeChart = chartOverview(ndxOverview, info, data);
             // create the ndx for the varius subcharts
             var ndx = crossfilter(data);
-            var dowChart = pieDow(ndx, info, data)
-            var typeChart = chartType(ndx, locations, data);
-            var locChart = chartLocation(ndx, locations, data);
-            var locDetailChart = chartLocDetail(ndx, locations, data);
-            var timeChart = chartTime(ndx, locations, data, rangeChart);
+            pieDow(ndx, info, data);
+            chartType(ndx, locations, data);
+            chartLocation(ndx, locations, data);
+            chartLocDetail(ndx, locations, data);
+            chartTime(ndx, locations, data, rangeChart);
             dc.renderAll('other-group');
             dc.renderAll();
         });
     });
 }
 
-init()
+init();
 
