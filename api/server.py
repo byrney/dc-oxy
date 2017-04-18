@@ -15,9 +15,6 @@ static = os.path.join(os.path.dirname(inspect.getsourcefile(lambda: 0)), '../dis
 # create the app
 app = flask.Flask(__name__, static_folder=static, static_url_path='')
 
-print(os.path.dirname(inspect.getsourcefile(lambda: 0)))
-print(static)
-print(app.static_folder)
 # unknown routes will fallback to static but '/' will not
 # so needs to be done explicitly
 @app.route('/')
