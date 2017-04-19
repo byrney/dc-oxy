@@ -8,6 +8,8 @@ require('./node_modules/purecss/build/grids.css');
 
 var weekdays = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
 var dtFormat = d3.time.format('%d/%m/%Y %H:%M');
+var colorScale = d3.scale.category20();
+
 //Magical function which will print out the crossfilter array
 function print_filter(filter){
 	var f=eval(filter);
@@ -17,6 +19,7 @@ function print_filter(filter){
 	console.log(filter+"("+f.length+") = "+JSON.stringify(f).replace("[","[\n\t").replace(/}\,/g,"},\n\t").replace("]","\n]"));
 } 
 function dataClean(r){
+    
     r.meter_id = +r.meter_id;
     r.net_energy = +r.net_energy;
     r.cumulative_energy = +r.cumulative_energy;
@@ -66,6 +69,7 @@ function chartOverview(ndx, info, data){
     var dim = ndx.dimension(dc.pluck('week'));
     var grp = dim.group().reduceSum(d => d.net_energy);
     var chart = dc.lineChart('#range', 'other-group');
+
     chart
         .height(null)
         .width(null)
@@ -170,6 +174,7 @@ function chartType(ndx, locations, data){
         .innerRadius(25)
         .dimension(dim)
         .group(grp)
+        .colors(colorScale)
     ;
     return chart;
 }
@@ -245,13 +250,15 @@ function stackedChart(ndx, locations, data, rangeChart){
     var kitchenType =  dim.group().reduceSum(function(d){return d.kitchenTotal; });
     var multiType =  dim.group().reduceSum(function(d){return d.multipleTotal; });
     var powerType =  dim.group().reduceSum(function(d){return d.powerTotal; });
-    var grp = remove_empty_bins(dim.group().reduceSum(d => d.net_energy));
-    var chart = dc.lineChart('#time');
+    var chart = dc.barChart('#time');
+    var yRange = ndx.dimension(m => locations[m.meter_id].location_detail);
     chart
-        .renderArea(true)
+        // .renderArea(true)
         .width(null)
         .height(null)
         .dimension(dim)
+        .brushOn(false)
+        .valueAccessor(function(d){return d.value;})
         .group(busbarType, 'Busbar')
         .stack(mechType, 'Mech Services')
         .stack(pduType, 'PDU')
@@ -260,15 +267,22 @@ function stackedChart(ndx, locations, data, rangeChart){
         .stack(kitchenType, 'Kitchen Equipment')
         .stack(multiType, 'Multiple')
         .stack(powerType, 'Power')
-        .mouseZoomable(true)
+        .mouseZoomable(false)
         .elasticY(true)
+        .zoomScale([1,30])
+        .alwaysUseRounding(true)
+        .barPadding(5)
+        .transition
+        .title(function(d,i) {
+            return 'Total net-energy: '+d.value+'Kwh';
+        })
         .x(d3.time.scale().domain(d3.extent(data, d => d.date_time)))
         .rangeChart(rangeChart)
         .margins({top: 20, right: 20, bottom: 50, left: 20})
+        .colors(colorScale)
     ;
     return chart;
 }
-
 
 function init(){
     d3.csv('../data/oxy_info_enh.csv', function(error, info){
