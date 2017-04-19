@@ -25,6 +25,7 @@ function dataClean(r){
     r.mechTotal =0;
     r.pduTotal =0;
     r.busbarTotal =0;
+    r.liftsTotal =0;
     r.lightingTotal =0;
     r.kitchenTotal =0;
     r.multipleTotal =0;
@@ -229,7 +230,10 @@ function remove_empty_bins(source_group) {
 //     ;
 //     return chart;
 // }
-
+var div = d3.select("body").append("div")   
+    .attr("class", "tooltip")               
+    .style("opacity", 0)
+    .style('background', 'red');
 
 function stackedChart(ndx, locations, data, rangeChart){
     var dim = ndx.dimension(function(d){return d['date_time']});
@@ -257,10 +261,10 @@ function stackedChart(ndx, locations, data, rangeChart){
         .stack(multiType, 'Multiple')
         .stack(powerType, 'Power')
         .mouseZoomable(true)
+        .elasticY(true)
         .x(d3.time.scale().domain(d3.extent(data, d => d.date_time)))
-        .legend(dc.legend().x(0).y(10).itemHeight(13).gap(5))
         .rangeChart(rangeChart)
-        .margins({top: 20, right: 50, bottom: 50, left: 80})
+        .margins({top: 20, right: 20, bottom: 50, left: 20})
     ;
     return chart;
 }
