@@ -272,7 +272,6 @@ function stackedChart(ndx, locations, data, rangeChart){
         .zoomScale([1,30])
         .alwaysUseRounding(true)
         .barPadding(5)
-        .transition
         .title(function(d,i) {
             return 'Total net-energy: '+d.value+'Kwh';
         })
